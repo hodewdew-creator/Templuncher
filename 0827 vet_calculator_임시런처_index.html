@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>수의 임상 계산기 – 임시 런처</title>
+  <style>
+    :root {
+      --bg:#f8f9fa; --line:#dee2e6; --soft:#f1f3f5; --txt:#212529; --muted:#868e96;
+      --blue:#228be6; --red:#fa5252; --green:#37b24d; --gray:#adb5bd;
+    }
+    * { box-sizing: border-box; }
+    body { margin:0; background:var(--bg); color:var(--txt); font-family:system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, Apple SD Gothic Neo, Noto Sans KR, sans-serif; }
+    header { background:#fff; border-bottom:1px solid var(--line); padding:16px; text-align:center; }
+    header h1 { margin:0; font-size:20px; }
+
+    .patient-info { padding:12px; background:#fff; border-bottom:1px solid var(--line); }
+    .row { display:flex; gap:12px; }
+    .row > div { flex:1; }
+    label { display:block; margin:8px 0 4px; font-size:14px; color:#495057; }
+    input { width:100%; padding:10px; font-size:16px; border:1px solid #ccc; border-radius:6px; }
+
+    .btnbar { display:flex; justify-content:center; gap:14px; margin:14px auto; max-width:420px; }
+    .btn { border:none; border-radius:8px; padding:10px 16px; font-size:15px; color:#fff; cursor:pointer; }
+    .btn.confirm { background:var(--green); }
+    .btn.reset { background:var(--gray); }
+
+    .tabs { display:flex; background:var(--soft); border-bottom:1px solid var(--line); }
+    .tab { flex:1; text-align:center; padding:12px; cursor:pointer; border-right:1px solid var(--line); user-select:none; }
+    .tab:last-child { border-right:none; }
+    .tab.active { background:#fff; font-weight:700; }
+
+    .container { padding:16px; }
+    .section { display:none; }
+    .section.active { display:block; }
+
+    .grid { display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:12px; }
+    .btn-link { padding:12px; font-size:15px; border:none; border-radius:10px; background:var(--blue); color:#fff; cursor:pointer; transition:transform .03s ease-in; }
+    .btn-link:active { transform:translateY(1px); }
+    .btn-link.special { background:var(--red); } /* 연결된 계산기 = 빨간 버튼 */
+
+    .notice { margin-top:12px; padding:12px; background:var(--soft); border:1px dashed var(--line); border-radius:8px; color:var(--muted); font-size:13px; }
+  </style>
+
+  <!--
+    🔧 개발 메모 (화면 비표시)
+    - 규칙: "연결된 계산기 = 빨간 버튼(.special)". 연결이 끊긴 상태는 파란색 기본(.btn-link).
+    - 새 계산기 버튼 추가 방법:
+      1) 해당 탭 내부의 .grid 영역에 아래 예시처럼 버튼 하나를 추가
+         <button class="btn-link special" onclick="openCalc('https://example.vercel.app')">새 계산기</button>
+         * 실제 연결이 없으면 special 클래스를 빼고 기본 파란색으로 두세요.
+      2) 연결 URL을 넣고, 실제 배포가 완료되면 class="btn-link special"로 변경
+    - 동일 계산기를 여러 탭에서 호출 가능(예: NaHCO₃는 CRI와 Bolus 모두에서 동일 URL 호출)
+    - 링크 열기 정책: 새 탭, noopener/noreferrer 적용 (openCalc 함수 참고)
+    - 환자 정보 입력란(window.patientData)에 저장되어 다른 계산기에서도 활용할 예정이라면,
+      postMessage 등으로 연동하는 확장 스펙을 추후 추가할 수 있음(현재는 단순 메모리 저장만).
+  -->
+</head>
+<body>
+  <header>
+    <h1>수의 임상 계산기 (임시 런처)</h1>
+  </header>
+
+  <section class="patient-info">
+    <div class="row">
+      <div>
+        <label for="name">환자 이름</label>
+        <input id="name" type="text" placeholder="냥냥이" onfocus="this.placeholder=''" />
+      </div>
+      <div>
+        <label for="weight">체중 (kg) *</label>
+        <input id="weight" type="number" placeholder="필수 입력" onfocus="this.placeholder=''" required />
+      </div>
+    </div>
+    <div class="row" style="margin-top:12px;">
+      <div>
+        <label for="k">칼륨 (mEq/L)</label>
+        <input id="k" type="number" step="0.1" placeholder="예: 3.5" />
+      </div>
+      <div>
+        <label for="ca">칼슘 (mg/dL)</label>
+        <input id="ca" type="number" step="0.1" placeholder="예: 9.8" />
+      </div>
+      <div>
+        <label for="hco3">중탄산 (mEq/L)</label>
+        <input id="hco3" type="number" step="0.1" placeholder="예: 20" />
+      </div>
+    </div>
+    <div class="btnbar">
+      <button class="btn confirm" onclick="handleConfirm()">확인</button>
+      <button class="btn reset" onclick="handleReset()">초기화</button>
+    </div>
+  </section>
+
+  <nav class="tabs">
+    <div class="tab active" onclick="showTab(0)">💧 일반수액</div>
+    <div class="tab" onclick="showTab(1)">💉 약물 CRI</div>
+    <div class="tab" onclick="showTab(2)">⚡ 약물 Bolus</div>
+  </nav>
+
+  <main class="container">
+    <!-- 탭 1: 일반수액 (원래 위치 유지) -->
+    <section class="section active">
+      <div class="grid">
+        <!-- 기존 비연결 버튼 예시 -->
+        <button class="btn-link">탈수교정 및 KCL보정</button>
+
+        <!-- ✅ PPN: 원래 일반수액 탭에 위치 → 연결 상태(빨강) -->
+        <button class="btn-link special" onclick="openCalc('https://ppn-calculator.vercel.app')">PPN 계산기</button>
+
+        <!-- ✅ 수혈: 원래 일반수액 탭에 위치 → 연결 상태(빨강) -->
+        <button class="btn-link special" onclick="openCalc('https://bloodtranscal.vercel.app')">수혈계산기</button>
+
+        <!-- ✅ 새로 추가: BPM counter -->
+        <button class="btn-link special" onclick="openCalc('https://bpm-test-t564-vercel.app')">BPM counter</button>
+      </div>
+      <p class="notice"> 현재는 빨간색버튼만 작동합니다.</p>
+    </section>
+
+    <!-- 탭 2: CRI (원래 위치 유지) -->
+    <section class="section">
+      <p style="margin:0 0 8px; font-weight:700;">💉 약물 선택</p>
+      <div class="grid">
+        <!-- ✅ NaHCO₃ CRI: 여기에서 연결 → 빨강 -->
+        <button class="btn-link special" onclick="openCalc('https://nahco3.vercel.app')">NaHCO₃ </button>
+
+        <!-- 이하 자리 유지용 버튼들 (미연결 파랑) -->
+        <button class="btn-link">Calcium Gluconate</button>
+        <button class="btn-link">Fentanyl</button>
+        <button class="btn-link">Norepinephrine</button>
+        <button class="btn-link">Dobutamine</button>
+        <button class="btn-link">Dopamine</button>
+        <button class="btn-link">Vasopressin</button>
+        <button class="btn-link">Metoclopramide</button>
+        <button class="btn-link">Insulin</button>
+        <button class="btn-link">범용 CRI 계산기</button>
+      </div>
+    </section>
+
+    <!-- 탭 3: Bolus (원래 위치 유지) -->
+    <section class="section">
+      <p style="margin:0 0 8px; font-weight:700;">⚡ Bolus 약물 계산</p>
+      <div class="grid">
+        
+        <button class="btn-link">범용 희석 계산기</button>
+        <button class="btn-link">범용 약물 용량 계산기</button>
+
+              <ul style="margin-top: 0;">
+        <li>Glycopyrrolate</li>
+        <li>Atropine</li>
+        <li>Epinephrine</li>
+        <li>Sodium Bicarbonate (NaHCO₃)</li>
+        <li>Calcium Gluconate</li>
+        <li>xylazine/yohimbin</li>
+        <li>fentanyl/naloxon</li>
+        <li>mannitol</li>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const tabs = document.querySelectorAll('.tab');
+    const sections = document.querySelectorAll('.section');
+
+    function showTab(i){
+      tabs.forEach((t,idx)=>t.classList.toggle('active', idx===i));
+      sections.forEach((s,idx)=>s.classList.toggle('active', idx===i));
+    }
+
+    function handleConfirm(){
+      const data = {
+        name: (document.getElementById('name').value||'이름 없음').trim(),
+        weight: parseFloat(document.getElementById('weight').value)||null,
+        k: parseFloat(document.getElementById('k').value)||null,
+        ca: parseFloat(document.getElementById('ca').value)||null,
+        hco3: parseFloat(document.getElementById('hco3').value)||null,
+      };
+      window.patientData = data; // 추후 확장용
+      document.querySelectorAll('.patient-info input').forEach(el=>{
+        el.style.transition='box-shadow .25s, background-color .25s';
+        el.style.boxShadow='0 0 0 2px #40c05740';
+        el.style.backgroundColor='#f8ffef';
+        setTimeout(()=>{ el.style.boxShadow='none'; el.style.backgroundColor=''; }, 700);
+      });
+    }
+
+    function handleReset(){
+      ['name','weight','k','ca','hco3'].forEach(id=>document.getElementById(id).value='');
+      window.patientData = null;
+    }
+
+    function openCalc(url){
+      window.open(url, '_blank', 'noopener,noreferrer');
+    }
+  </script>
+</body>
+</html>
