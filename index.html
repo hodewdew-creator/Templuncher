@@ -40,7 +40,7 @@
     .grid { display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:12px; }
     .btn-link { padding:12px; font-size:15px; border:none; border-radius:10px; background:var(--blue); color:#fff; cursor:pointer; transition:transform .03s ease-in; }
     .btn-link:active { transform:translateY(1px); }
-    .btn-link.special { background:var(--red); } /* 연결된 계산기 = 빨간 버튼 */
+    .btn-link.special { background:var(--blue); } /* 연결된 계산기 = 빨간 버튼 */
 
     .notice { margin-top:12px; padding:12px; background:var(--soft); border:1px dashed var(--line); border-radius:8px; color:var(--muted); font-size:13px; }
   </style>
@@ -117,7 +117,7 @@
         <button class="btn-link special" onclick="openCalc('https://cat-pregnancy-cal.vercel.app/')">임신출산계산기(cat)</button>       
 
       </div>
-      <p class="notice"> 현재는 빨간버튼만 작동합니다. (상단 환자정보 반영 안됩니다.) <br> 사파리에서 열기 - 📤 - 홈화면에 추가 → 앱아이콘 생성됩니다.  <br>  </p>
+      <p class="notice"> 현재는 링크만 작동합니다. (상단 환자정보 반영 안됩니다.) <br> 사파리에서 열기 - 📤 - 홈화면에 추가 → 앱아이콘 생성됩니다.  <br>  </p>
     </section>
 
     <!-- 탭 2: CRI (원래 위치 유지) -->
@@ -138,7 +138,8 @@
         <button class="btn-link special" onclick="openCalc('https://vaso-cri-calculator.vercel.app/')">Vasopressin</button>
         <button class="btn-link special" onclick="openCalc('https://Phosphate-cri-calculator.vercel.app/')">Phosphate</button>
         <button class="btn-link special" onclick="openCalc('https://general-cri-calculator.vercel.app/')">범용CRI계산기</button>
-       <button class="btn-link">Insulin</button>
+        <button class="btn-link special" onclick="openCalc('https://dka-cri-cal.vercel.app/')">DKA인슐린계산기</button>
+       
   
       </div>
     </section>
