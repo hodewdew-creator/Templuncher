@@ -11,6 +11,7 @@
     :root {
       --bg:#f8f9fa; --line:#dee2e6; --soft:#f1f3f5; --txt:#212529; --muted:#868e96;
       --blue:#003399; --red:#fa5252; --green:#37b24d; --gray:#adb5bd;
+      --pink:
     }
     * { box-sizing: border-box; }
     body { margin:0; background:var(--bg); color:var(--txt); font-family:system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, Apple SD Gothic Neo, Noto Sans KR, sans-serif; }
@@ -40,7 +41,8 @@
     .grid { display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:12px; }
     .btn-link { padding:12px; font-size:15px; border:none; border-radius:10px; background:var(--blue); color:#fff; cursor:pointer; transition:transform .03s ease-in; }
     .btn-link:active { transform:translateY(1px); }
-    .btn-link.special { background:var(--blue); } /* 연결된 계산기 = 빨간 버튼 */
+    .btn-link.special { background:var(--blue); } /* 연결된 계산기 = 파란 버튼 */
+    .btn-link.special { backgreound:var(--pink); } /* 특별한 계산기 = 연핑크 */
 
     .notice { margin-top:12px; padding:12px; background:var(--soft); border:1px dashed var(--line); border-radius:8px; color:var(--muted); font-size:13px; }
   </style>
@@ -78,7 +80,7 @@
     </div>
 
     <div class="btnbar">
-      <button class="btn confirm" onclick="handleConfirm()">확인</button>
+      <button class="btn reset" onclick="handleReset()">확인</button>
       <button class="btn reset" onclick="handleReset()">초기화</button>
     </div>
   </section>
