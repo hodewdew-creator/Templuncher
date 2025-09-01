@@ -11,7 +11,7 @@
     :root {
       --bg:#f8f9fa; --line:#dee2e6; --soft:#f1f3f5; --txt:#212529; --muted:#868e96;
       --blue:#003399; --red:#fa5252; --green:#37b24d; --gray:#adb5bd;
-      --pink:
+      --purple:#330066
     }
     * { box-sizing: border-box; }
     body { margin:0; background:var(--bg); color:var(--txt); font-family:system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, Apple SD Gothic Neo, Noto Sans KR, sans-serif; }
@@ -42,7 +42,7 @@
     .btn-link { padding:12px; font-size:15px; border:none; border-radius:10px; background:var(--blue); color:#fff; cursor:pointer; transition:transform .03s ease-in; }
     .btn-link:active { transform:translateY(1px); }
     .btn-link.special { background:var(--blue); } /* 연결된 계산기 = 파란 버튼 */
-    .btn-link.special { backgreound:var(--pink); } /* 특별한 계산기 = 연핑크 */
+    .btn-link.purple { backgreound:var(--purple); } /* 특별한 계산기 = 연핑크 */
 
     .notice { margin-top:12px; padding:12px; background:var(--soft); border:1px dashed var(--line); border-radius:8px; color:var(--muted); font-size:13px; }
   </style>
@@ -101,8 +101,8 @@
         <button class="btn-link special" onclick="openCalc('https://ppn-calculator.vercel.app')">RER/PPN 계산기</button>
         <button class="btn-link special" onclick="openCalc('https://blootranscal.vercel.app')">수혈계산기</button>
         <button class="btn-link special" onclick="openCalc('https://custombpm.vercel.app')">BPM counter(new)</button>
-        <button class="btn-link special" onclick="openCalc('https://dilution-calculator-rouge.vercel.app/')">범용 희석계산기</button>
-        <button class="btn-link special" onclick="openCalc('https://general-drug-calculator.vercel.app/')">범용 약물용량계산기</button>
+        <button class="btn-link purple" onclick="openCalc('https://dilution-calculator-rouge.vercel.app/')">범용 희석계산기</button>
+        <button class="btn-link purple" onclick="openCalc('https://general-drug-calculator.vercel.app/')">범용 약물용량계산기</button>
         <button class="btn-link special" onclick="openCalc('https://cat-pregnancy-cal.vercel.app/')">임신출산계산기(cat)</button>       
 
       </div>
@@ -126,8 +126,8 @@
         <button class="btn-link special" onclick="openCalc('https://meto-cri-calculator.vercel.app/')">Metoclopramide</button>
         <button class="btn-link special" onclick="openCalc('https://vaso-cri-calculator.vercel.app/')">Vasopressin</button>
         <button class="btn-link special" onclick="openCalc('https://Phosphate-cri-calculator.vercel.app/')">Phosphate</button>
-        <button class="btn-link special" onclick="openCalc('https://general-cri-calculator.vercel.app/')">범용CRI계산기</button>
-        <button class="btn-link special" onclick="openCalc('https://dka-cri-cal.vercel.app/')">DKA인슐린계산기</button>
+        <button class="btn-link purple" onclick="openCalc('https://general-cri-calculator.vercel.app/')">범용CRI계산기</button>
+        <button class="btn-link special" onclick="openCalc('https://dka-cri-cal.vercel.app/')">Insulin(DKA)</button>
        
   
       </div>
