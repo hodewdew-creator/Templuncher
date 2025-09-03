@@ -176,18 +176,44 @@
 
 
     <!-- 탭 3: Bolus (원래 위치 유지) -->
-    <section class="section">
-      <p style="margin:0 0 8px; font-weight:700;">⚡ Bolus 약물 계산</p>
-      <div class="grid">
-        
-        <button class="btn-link special" onclick="openCalc('https://emer-bolus-calculator.vercel.app/')">응급약물bolus계산기</button>
-      </div>
-    </section>
-  </main>
+<section class="section">
+  <p style="margin:0 0 8px; font-weight:700;">⚡ Bolus 약물 계산</p>
+  <div class="grid">
+    <!-- 새 탭 열기 대신 하단 임베드 표시 -->
+    <button class="btn-link special" onclick="showBolusEmbed()">응급약물bolus계산기</button>
+    <!-- (선택) 새 탭 열기 버튼을 따로 두고 싶으면 아래 유지 -->
+    <!-- <button class="btn-link" onclick="openCalc('https://emer-bolus-calculator.vercel.app/')">새 탭으로 열기</button> -->
+  </div>
 
+  <!-- ⬇️ 하단 임베드 영역 -->
+  <div id="bolus-embed" style="
+      display:none; margin-top:6px; width:100%;
+      height:72vh; border:0; border-radius:12px; overflow:hidden;
+      box-shadow:0 6px 20px rgba(0,0,0,.08);">
+    <iframe id="bolus-frame"
+      title="응급약물 bolus 계산기"
+      loading="lazy"
+      referrerpolicy="no-referrer-when-downgrade"
+      style="width:100%; height:100%; border:0;"></iframe>
+  </div>
+</section>
+
+    
   <script>
     const tabs = document.querySelectorAll('.tab');
     const sections = document.querySelectorAll('.section');
+
+    <!--bolus imbed-->
+   function showBolusEmbed(){
+    const wrap = document.getElementById('bolus-embed');
+    const frame = document.getElementById('bolus-frame');
+    if(!frame.src){
+      frame.src = 'https://emer-bolus-calculator.vercel.app/';
+    }
+    wrap.style.display = 'block';
+    // 보기 좋게 스크롤
+    wrap.scrollIntoView({ behavior:'smooth', block:'start' });
+  }
 
     function showTab(i){
       tabs.forEach((t,idx)=>t.classList.toggle('active', idx===i));
