@@ -272,6 +272,44 @@
     function openCalc(url){
       window.open(url, '_blank', 'noopener,noreferrer');
     }
+
+     // ✅ 이 주소만 PIN 확인 걸기
+  const UPLOADER_URL = 'https://bs-image-uploader.vercel.app/';
+
+  // ✅ 병원 공용 PIN (원하는 값으로 바꿔줘)
+  const REQUIRED_PIN = '6364';
+
+  // ✅ 한번 통과하면 10분간은 다시 안 물어봄
+  const PIN_CACHE_KEY = 'uploader_pin_ok_ts';
+  function uploaderRecentlyUnlocked() {
+    const ts = Number(sessionStorage.getItem(PIN_CACHE_KEY) || 0);
+    return Date.now() - ts < 10 * 60 * 1000; // 10분
+  }
+  function markUploaderUnlocked() {
+    sessionStorage.setItem(PIN_CACHE_KEY, String(Date.now()));
+  }
+
+  // 🔁 기존 openCalc 업그레이드: 업로더 URL일 때만 PIN 확인
+  function openCalc(url){
+    try{
+      const isUploader = url && url.replace(/\/+$/,'') === UPLOADER_URL.replace(/\/+$/,'');
+      if (isUploader) {
+        if (!uploaderRecentlyUnlocked()) {
+          const input = prompt('업로더 접속 PIN을 입력하세요');
+          if (input === null) return; // 취소
+          if (input !== REQUIRED_PIN) {
+            alert('PIN이 올바르지 않습니다.');
+            return;
+          }
+          markUploaderUnlocked();
+        }
+      }
+      window.open(url, '_blank', 'noopener,noreferrer');
+    } catch(e){
+      console.error(e);
+      window.open(url, '_blank', 'noopener,noreferrer');
+    }
+  }
   </script>
 </body>
 </html>
